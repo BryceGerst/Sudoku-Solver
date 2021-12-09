@@ -1,0 +1,13 @@
+[package]
+name = "sudoku_solver"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+conrod_core = "0.76.0"
+conrod_glium = "0.76.0"
+conrod_winit = "0.76.0"
+glium = "*"
+winit = "0.23"
