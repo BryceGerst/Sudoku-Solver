@@ -75,6 +75,7 @@ fn fill_solved_values(board_str: &mut Vec<Vec<String>>, side_length: i32, succes
     }
 }
 
+// code borrowed from Conrod hello world program https://docs.rs/conrod_core/latest/conrod_core/guide/chapter_3/index.html
 fn main() {
     // Build the window.
     let event_loop = glium::glutin::event_loop::EventLoop::new();
@@ -94,8 +95,11 @@ fn main() {
     let ids = Ids::new(ui.widget_id_generator());
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
-    const FONT_PATH: &'static str = concat!(env!("CARGO_MANIFEST_DIR"), "/fonts/NotoSans/NotoSans-Regular.ttf");
-    ui.fonts.insert_from_file(FONT_PATH).unwrap();
+    let assets = find_folder::Search::KidsThenParents(3, 5)
+        .for_folder("fonts")
+        .unwrap();
+    let font_path = assets.join("NotoSans/NotoSans-Regular.ttf");
+    ui.fonts.insert_from_file(font_path).unwrap();
 
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.
