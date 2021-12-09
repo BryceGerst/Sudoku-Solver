@@ -58,7 +58,7 @@ fn fill_solved_values(board_str: &mut Vec<Vec<String>>, side_length: i32, succes
                 let result: Result<i32, _> = i32::from_str_radix(&board_str[r as usize][c as usize], (side_length + 1) as u32);
                 match result {
                     Err(_) => {*success_str = "Unable to solve!".to_string(); return;},
-                    Ok(num) => if num >= 1 && num <= side_length {solver::update_board(&mut board, num, r as usize, c as usize, side_length);} else {*success_str = "Unable to solve!".to_string(); return;}
+                    Ok(num) => if num >= 1 && num <= side_length {if !solver::update_board(&mut board, num, r as usize, c as usize, side_length) {*success_str = "Unable to solve!".to_string(); return;}} else {*success_str = "Unable to solve!".to_string(); return;}
                 }
             }
         }

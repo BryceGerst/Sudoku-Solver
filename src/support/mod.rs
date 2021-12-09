@@ -1,3 +1,4 @@
+// entire file borrowed from conrod examples
 #![allow(dead_code)]
 
 use glium::{

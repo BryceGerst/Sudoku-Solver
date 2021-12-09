@@ -192,8 +192,11 @@ pub fn solve_board(board: &mut Vec<Vec<Vec<i32>>>, side_length: i32) -> bool {
                 }
                 if found_value != None {
                     //println!("Determined that row {}, col {} must have value {}", (row+1), (col+1), found_value.unwrap());
-                    update_board(board, found_value.unwrap(), row as usize, col as usize, side_length);
-                    return solve_board(board, side_length); // we want to repeat the process from the start as soon as any value is determined
+                    if !update_board(board, found_value.unwrap(), row as usize, col as usize, side_length) {
+                        return false;
+                    } else{
+                        return solve_board(board, side_length); // we want to repeat the process from the start as soon as any value is determined
+                    }
                 }
 
             }
@@ -238,7 +241,10 @@ pub fn solve_board(board: &mut Vec<Vec<Vec<i32>>>, side_length: i32) -> bool {
                     //println!("eliminated {}", bad_val.unwrap());
                     let remove_index = board[row as usize][col as usize].iter().position(|&e| e == bad_val.unwrap()).unwrap();
                     board[row as usize][col as usize].remove(remove_index);
-                    if board[row as usize][col as usize].len() == 1 {
+                    let remaining_length = board[row as usize][col as usize].len();
+                    if remaining_length == 0 {
+                        return false;
+                    } else if remaining_length == 1 {
                         if !update_board(board, board[row as usize][col as usize][0], row as usize, col as usize, side_length) {
                             return false;
                         }
