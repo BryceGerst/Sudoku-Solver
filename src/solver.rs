@@ -1,5 +1,3 @@
-use std::io::{self, Write, BufRead};
-
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
@@ -239,43 +237,53 @@ pub fn solve_board(board: &mut SudokuBoard, side_length: i32) -> bool {
             }
         }
     }
-    // third guess possible values for each square and see if they could work
+    // third guess possible values for each square and see if they could work (guesses on square with the fewest possible values first)
     let mut rng = thread_rng();
+    let mut min_len = side_length + 1;
+    let mut min_vs: Vec<i32> = vec![0];
+    let mut min_info: (i32, i32) = (0,0); // row, col
     for r in 0..side_length {
         for c in 0..side_length {
             if board.values[r as usize][c as usize] == None {
                 let box_num: usize = get_box_num(r as usize, c as usize, side_length);
                 let mut vs = possible_vals(board, r as usize, c as usize, box_num, side_length);
-                vs.shuffle(&mut rng);
-                for guess_v in vs {
-                     // place the value in the board, see if it could work
-                     if !update_board(board, guess_v, r as usize, c as usize, side_length) {
-                         return false; // guess value was not valid, this should never happen
-                     } else {
-                         if solve_board(board, side_length) {
-                            return true;
-                         } else {
-                            // if it does not work, undo the placement
-                            /*println!("val {} cant be at r {} c {}", guess_v, r, c);
-                            for row in 0..side_length {
-                                for col in 0..side_length {
-                                    if board.values[row as usize][col as usize] != None {
-                                        print!("| {} |", board.values[row as usize][col as usize].unwrap());
-                                    } else {
-                                        print!("|   |");
-                                    }
-                                }
-                                println!();
+                let len = vs.len();
+                if len == 2 { // the lowest possible number of values to guess from is 2, so if we find this we immediately do the guess
+                    vs.shuffle(&mut rng);
+                    for guess_v in vs {
+                        // place the value in the board, see if it could work
+                        if !update_board(board, guess_v, r as usize, c as usize, side_length) {
+                            return false; // guess value was not valid, this should never happen
+                        } else {
+                            if solve_board(board, side_length) {
+                               return true;
+                            } else {
+                               remove_val(board, guess_v, r as usize, c as usize, side_length);
                             }
-                            println!("-------------------------------------");*/
-                            remove_val(board, guess_v, r as usize, c as usize, side_length);
-                         }
-                     }
+                        }
+                   }
+                   return false; // if it deemed that none of the possible values for any given square could lead to a solvable board, then the board is unsolvable
+                } else if (len as i32) < min_len {
+                    min_len = len as i32;
+                    min_vs = vs.clone();
+                    min_info = (r, c);
                 }
-                return false; // if it deemed that none of the possible values for any given square could lead to a solvable board, then the board is unsolvable
             }
         }
     }
-
-    return false; // if we have hit this point that means no chain of guesses resulted in a working solution
+    let (r, c) = min_info;
+    min_vs.shuffle(&mut rng);
+    for guess_v in min_vs {
+        // place the value in the board, see if it could work
+        if !update_board(board, guess_v, r as usize, c as usize, side_length) {
+            return false; // guess value was not valid, this should never happen
+        } else {
+            if solve_board(board, side_length) {
+                return true;
+            } else {
+                remove_val(board, guess_v, r as usize, c as usize, side_length);
+            }
+        }
+    }
+    return false; // if it deemed that none of the possible values for any given square could lead to a solvable board, then the board is unsolvable
 }

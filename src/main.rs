@@ -3,14 +3,13 @@
 #[macro_use]
 extern crate conrod_core;
 extern crate conrod_glium;
-#[macro_use]
 extern crate conrod_winit;
 extern crate glium;
 
 mod support;
 mod solver;
 
-use conrod_core::{widget, Colorable, Positionable, Widget, Sizeable, Labelable};
+use conrod_core::{widget, Positionable, Widget, Sizeable, Labelable};
 use glium::Surface;
 
 use solver::CheckablySquare;
