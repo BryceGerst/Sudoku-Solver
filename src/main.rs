@@ -12,7 +12,9 @@ mod solver;
 
 use conrod_core::{widget, Colorable, Positionable, Widget, Sizeable, Labelable};
 use glium::Surface;
+
 use solver::CheckablySquare;
+
 use std::cmp;
 
 const WIDTH: u32 = 1200;
@@ -51,7 +53,13 @@ fn update_square_str(s: String, side_length: i32) -> String {
 }
 
 fn fill_solved_values(board_str: &mut Vec<Vec<String>>, side_length: i32, success_str: &mut String) {
-    let mut board = vec![vec![(1..=side_length).collect::<Vec<i32>>(); side_length as usize]; side_length as usize];
+    let empty_values: Vec<Vec<Option<i32>>> = vec![vec![None; side_length as usize]; side_length as usize];
+    let row_vals: Vec<Vec<bool>> = vec![vec![false; side_length as usize]; side_length as usize];
+    let col_vals: Vec<Vec<bool>> = vec![vec![false; side_length as usize]; side_length as usize];
+    let box_vals: Vec<Vec<bool>> = vec![vec![false; side_length as usize]; side_length as usize];
+
+    let mut board = solver::SudokuBoard {values: empty_values, val_in_row: row_vals, val_in_col: col_vals, val_in_box: box_vals};
+
     for r in 0..side_length {
         for c in 0..side_length {
             if board_str[r as usize][c as usize] != "".to_string() {
@@ -66,7 +74,7 @@ fn fill_solved_values(board_str: &mut Vec<Vec<String>>, side_length: i32, succes
     if solver::solve_board(&mut board, side_length) {
         for r in 0..side_length {
             for c in 0..side_length {
-                board_str[r as usize][c as usize] = format_radix(board[r as usize][c as usize][0] as u32, (side_length + 1) as u32).to_uppercase();//board[r as usize][c as usize][0].to_string();
+                board_str[r as usize][c as usize] = format_radix(board.values[r as usize][c as usize].unwrap() as u32, (side_length + 1) as u32).to_uppercase();//board[r as usize][c as usize][0].to_string();
             }
         }
         *success_str = "Solved!".to_string();
